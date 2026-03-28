@@ -1,0 +1,161 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to release (e.g. v1.3.0). Required when dispatching manually.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Validate workflow_dispatch inputs
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        TAG="${{ inputs.tag_name }}"
+        if [ -z "$TAG" ]; then
+          echo "❌ tag_name is required when running workflow_dispatch. Provide a value such as 'v1.3.0'."
+          exit 1
+        fi
+        if ! echo "$TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "❌ tag_name '${TAG}' is not a valid version tag. Expected format: v<major>.<minor>.<patch> (e.g. v1.3.0)."
+          exit 1
+        fi
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.tag_name != '' && inputs.tag_name || github.ref }}
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Run tests
+      run: ./gradlew test --stacktrace
+
+    - name: Validate signing secrets
+      run: |
+        test -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" || (echo "Missing secret: ANDROID_KEYSTORE_BASE64" && exit 1)
+        test -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" || (echo "Missing secret: ANDROID_KEYSTORE_PASSWORD" && exit 1)
+        test -n "${{ secrets.ANDROID_KEY_ALIAS }}" || (echo "Missing secret: ANDROID_KEY_ALIAS" && exit 1)
+        test -n "${{ secrets.ANDROID_KEY_PASSWORD }}" || (echo "Missing secret: ANDROID_KEY_PASSWORD" && exit 1)
+
+    - name: Decode signing keystore
+      run: |
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > kyuubimask-release.jks
+        ls -lh kyuubimask-release.jks
+
+    - name: Build Release APK (signed)
+      env:
+        ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/kyuubimask-release.jks
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      run: ./gradlew assembleRelease --stacktrace
+
+    - name: Verify APK was built
+      run: |
+        if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+          echo "✅ APK built successfully"
+          ls -lh app/build/outputs/apk/release/app-release.apk
+        else
+          echo "❌ APK not found at expected location"
+          echo "Contents of release directory:"
+          ls -la app/build/outputs/apk/release/ || echo "Release directory not found"
+          exit 1
+        fi
+
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v6
+      with:
+        name: app-release-signed
+        path: app/build/outputs/apk/release/app-release.apk
+        retention-days: 90
+
+    - name: Get version from tag
+      id: get_version
+      if: startsWith(github.ref, 'refs/tags/') || inputs.tag_name != ''
+      env:
+        INPUT_TAG: ${{ inputs.tag_name }}
+      run: |
+        if [ -n "$INPUT_TAG" ]; then
+          echo "VERSION=$INPUT_TAG" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/') || inputs.tag_name != ''
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        files: app/build/outputs/apk/release/app-release.apk
+        body: |
+          ## KyuubiMask ${{ steps.get_version.outputs.VERSION }}
+
+          Privacy-first notification masking for everyday use.
+
+          ### 📦 Asset
+          - `app-release.apk` (signed)
+
+          ### ✅ Highlights
+          - Fully offline operation (no internet permission)
+          - Notification content masking for supported apps
+          - Lightweight, always-on optimized behavior
+
+          ### 📝 Changelog
+          See [CHANGELOG.md](CHANGELOG.md) for details.
+
+          ### 🔐 Security
+          This build is signed and ready to install.
+
+          ### ⚠️ Install Note
+          Sideload only from this official repository release page.
+
+          ---
+
+          日常で使える、プライバシー重視の通知マスキングアプリです。
+
+          ### 📦 配布ファイル
+          - `app-release.apk`（署名済み）
+
+          ### ✅ 主なポイント
+          - 完全オフライン動作（インターネット権限なし）
+          - 対応アプリの通知内容をマスク
+          - 常時利用向けの軽量設計
+
+          ### 📝 変更内容
+          詳細は [CHANGELOG.md](CHANGELOG.md) を参照してください。
+
+          ### 🔐 セキュリティ
+          このビルドは署名済みで、そのままインストールできます。
+
+          ### ⚠️ インストール時の注意
+          APK は公式リリースページからのみ取得してください。
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Cleanup signing keystore
+      if: always()
+      run: rm -f kyuubimask-release.jks
+    
