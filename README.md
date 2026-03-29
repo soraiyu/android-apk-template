@@ -123,6 +123,37 @@ Also update the `package` attribute in `app/src/main/AndroidManifest.xml`
 and rename the package directory under `app/src/main/java/`.
 
 ---
+
+<details>
+<summary>🔒 About security: why Actions are pinned to commit SHAs</summary>
+
+The workflow files in this template reference third-party Actions like this:
+
+```yaml
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+```
+
+The long hex string is a **commit SHA**, not a version tag.
+
+### Why not just use `@v6`?
+
+A tag like `v6` is a mutable pointer — the owner of that repository can silently move it to a different commit at any time.  
+If that happens (whether by an accident, a supply-chain attack, or a compromised account), every project using `@v6` would run the attacker's code the next time the workflow triggers — with full access to your repository secrets.
+
+### Why a SHA is safer
+
+A commit SHA is immutable. Once a commit exists, its SHA can never be made to point to different code.  
+Pinning to a SHA guarantees you run exactly the code you reviewed, nothing more.
+
+The human-readable tag is kept as a comment (`# v6`) so you can still tell at a glance which version is in use.
+
+### Further reading
+
+- [Security hardening for GitHub Actions — Using third-party Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions) (GitHub Docs, official)
+
+</details>
+
+---
 ---
 
 # android-apk-template（日本語）
@@ -251,3 +282,34 @@ defaultConfig {
 
 合わせて `app/src/main/AndroidManifest.xml` の `package` 属性と  
 `app/src/main/java/` 以下のパッケージ名も変更してください。
+
+---
+
+<details>
+<summary>🔒 セキュリティについて：Action をコミット SHA でピン留めしている理由</summary>
+
+このテンプレートのワークフローファイルでは、サードパーティの Action を次のように参照しています。
+
+```yaml
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+```
+
+長い 16 進数の文字列が**コミット SHA** です。バージョンタグではありません。
+
+### `@v6` だとなぜ問題があるのか
+
+`v6` のようなタグは「可変ポインター」です。そのリポジトリのオーナーがいつでも別のコミットへ指し直すことができます。  
+万が一それが起きた場合（ミス・サプライチェーン攻撃・アカウント侵害など）、`@v6` を使っているすべてのプロジェクトで、次にワークフローが走った瞬間から攻撃者のコードが実行されます。しかもリポジトリの Secrets に完全アクセスできる状態で。
+
+### SHA が安全な理由
+
+コミット SHA は不変です。一度存在したコミットは、その SHA が別のコードを指すことは絶対にありません。  
+SHA にピン留めすることで、レビューしたそのコードだけが実行されることを保証できます。
+
+コメントとしてタグ名（`# v6`）を残してあるので、どのバージョンを使っているかは一目でわかります。
+
+### 参考資料
+
+- [GitHub Actions のセキュリティ強化 — サードパーティアクションの使用](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)（GitHub 公式ドキュメント）
+
+</details>
