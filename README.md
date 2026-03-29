@@ -13,7 +13,7 @@ Three GitHub Actions workflows are included out of the box:
 |---|---|---|
 | `android-ci.yml` | Push / PR to `main` | Debug APK (Artifact, 30 days) |
 | `release.yml` | Manual dispatch or `v*` tag push | Signed release APK (Artifact, 90 days) + GitHub Release |
-| `generate-keystore.yml` | Manual dispatch (once) | Keystore + passwords printed to Job Summary |
+| `generate-keystore.yml` | Manual dispatch (once) | Keystore + passwords auto-saved as repository Secrets |
 
 ---
 
@@ -25,7 +25,7 @@ Three GitHub Actions workflows are included out of the box:
 
 ---
 
-## Step ① — Generate a keystore and register Secrets
+## Step ① — Generate a keystore (auto-saves Secrets)
 
 Run **generate-keystore.yml** once when you first set up the repository.
 
@@ -37,8 +37,7 @@ Run **generate-keystore.yml** once when you first set up the repository.
    - `key_o` : Organization (defaults to owner name if blank)
    - `key_c` : country code (default: `US`)
    - `validity_days` : validity in days (default: `10000` ≈ 27 years)
-4. Once the job finishes, open the **"Summary"** tab and register the displayed values as repository Secrets  
-   **Settings → Secrets and variables → Actions → New repository secret**
+4. The workflow automatically registers the following repository Secrets — no manual copy-paste needed:
 
    | Secret name | Description |
    |---|---|
@@ -46,9 +45,14 @@ Run **generate-keystore.yml** once when you first set up the repository.
    | `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
    | `ANDROID_KEY_ALIAS` | Key alias |
    | `ANDROID_KEY_PASSWORD` | Key password |
-   | `ANDROID_DEBUG_KEYSTORE_BASE64` | Debug keystore (Base64, optional) |
+   | `ANDROID_DEBUG_KEYSTORE_BASE64` | Debug keystore (Base64) |
 
-   > ⚠️ Passwords are shown only in the Job Summary. Copy them immediately.
+   Verify they were registered under **Settings → Secrets and variables → Actions**.
+
+   > ⚠️ The keystore files are **not** stored in the repository. If you lose the release
+   > keystore after publishing to Google Play, you'll need to generate a new one and
+   > bump the app's `applicationId`. Running this workflow again will **overwrite** the
+   > existing Secrets.
 
 ---
 
@@ -171,7 +175,7 @@ Android アプリ開発の出発点として使えるテンプレートです。
 |---|---|---|
 | `android-ci.yml` | `main` への Push / PR | デバッグ APK（Artifact、30 日保存） |
 | `release.yml` | 手動実行 または `v*` タグ push | 署名済みリリース APK（Artifact、90 日保存）+ GitHub Release |
-| `generate-keystore.yml` | 手動実行（初回のみ） | キーストア＋パスワードをジョブサマリーに表示 |
+| `generate-keystore.yml` | 手動実行（初回のみ） | キーストア＋パスワードを Secrets に自動登録 |
 
 ---
 
@@ -183,7 +187,7 @@ Android アプリ開発の出発点として使えるテンプレートです。
 
 ---
 
-## ① キーストアの生成と Secrets への登録
+## ① キーストアの生成（Secrets を自動登録）
 
 初回セットアップ時に **generate-keystore.yml** を一度だけ実行します。
 
@@ -195,8 +199,7 @@ Android アプリ開発の出発点として使えるテンプレートです。
    - `key_o` : Organization（空欄だとオーナー名が使われます）
    - `key_c` : 国コード（デフォルト: `US`）
    - `validity_days` : 有効期間（日数、デフォルト: `10000` ≒ 27 年）
-4. ジョブが完了したら **「Summary」** タブを開き、表示された値を以下の Secrets に登録する  
-   **Settings → Secrets and variables → Actions → New repository secret**
+4. ワークフローが以下の Secrets を**自動的に登録**します — 手動コピーは不要です:
 
    | Secret 名 | 説明 |
    |---|---|
@@ -204,9 +207,11 @@ Android アプリ開発の出発点として使えるテンプレートです。
    | `ANDROID_KEYSTORE_PASSWORD` | キーストアのパスワード |
    | `ANDROID_KEY_ALIAS` | キーのエイリアス |
    | `ANDROID_KEY_PASSWORD` | キーのパスワード |
-   | `ANDROID_DEBUG_KEYSTORE_BASE64` | デバッグ用キーストア（Base64、任意） |
+   | `ANDROID_DEBUG_KEYSTORE_BASE64` | デバッグ用キーストア（Base64） |
 
-   > ⚠️ パスワードはジョブサマリーにしか表示されません。必ずその場でコピーしてください。
+   登録されたかどうかは **Settings → Secrets and variables → Actions** で確認できます。
+
+   > ⚠️ キーストアファイルはリポジトリに保存されません。Google Play 公開後にリリースキーストアを失った場合は、新しく生成し `applicationId` を変更する必要があります。このワークフローを再実行すると既存の Secrets が**上書き**されます。
 
 ---
 
