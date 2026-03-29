@@ -22,10 +22,26 @@ Three GitHub Actions workflows are included out of the box:
 - Java 17 (set up automatically in CI)
 - Android Gradle Plugin 8.7.x / Gradle 8.11.x
 - `applicationId`: `com.example.myapp` (change in `app/build.gradle.kts`)
+- A **Fine-grained Personal Access Token** stored as a repository secret named `GH_PAT` (required once — see Step ① below)
 
 ---
 
 ## Step ① — Generate a keystore (auto-saves Secrets)
+
+> **One-time prerequisite — create `GH_PAT`**
+>
+> `GITHUB_TOKEN` cannot write repository Secrets (a GitHub platform limitation).  
+> You need to create a **Fine-grained Personal Access Token** with write access to Secrets and store it as `GH_PAT` **once**:
+>
+> 1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
+> 2. Click **"Generate new token"**
+> 3. Set **Repository access** → *Only select repositories* → choose this repository
+> 4. Under **Permissions → Repository permissions**, set **Secrets** → **Read and write**
+> 5. Click **"Generate token"** and copy the token value
+> 6. In your repository, go to **Settings → Secrets and variables → Actions → New repository secret**
+> 7. Name: `GH_PAT` / Value: paste the token → click **"Add secret"**
+>
+> This is a one-time setup. After this, `generate-keystore.yml` runs fully unattended.
 
 Run **generate-keystore.yml** once when you first set up the repository.
 
@@ -184,10 +200,26 @@ Android アプリ開発の出発点として使えるテンプレートです。
 - Java 17（CI は自動セットアップ）
 - Android Gradle Plugin 8.7.x / Gradle 8.11.x
 - `applicationId`: `com.example.myapp`（`app/build.gradle.kts` で変更可）
+- **Fine-grained Personal Access Token** をリポジトリの Secret に `GH_PAT` という名前で登録済みであること（初回のみ — 下記 ① を参照）
 
 ---
 
 ## ① キーストアの生成（Secrets を自動登録）
+
+> **事前準備（初回のみ）— `GH_PAT` を作成する**
+>
+> `GITHUB_TOKEN` はリポジトリの Secrets に書き込めません（GitHub の仕様上の制限）。  
+> Secrets への書き込み権限を持つ **Fine-grained Personal Access Token** を作成し、`GH_PAT` として登録する必要があります。
+>
+> 1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens** を開く
+> 2. **「Generate new token」** をクリック
+> 3. **Repository access** → *Only select repositories* → このリポジトリを選択
+> 4. **Permissions → Repository permissions** で **Secrets** → **Read and write** に設定
+> 5. **「Generate token」** をクリックし、表示されたトークンをコピー
+> 6. このリポジトリの **Settings → Secrets and variables → Actions → New repository secret** を開く
+> 7. Name: `GH_PAT` / Value: コピーしたトークンを貼り付けて **「Add secret」** をクリック
+>
+> この作業は初回のみです。登録後は `generate-keystore.yml` が完全自動で動作します。
 
 初回セットアップ時に **generate-keystore.yml** を一度だけ実行します。
 
