@@ -52,20 +52,27 @@ jobs:
       run: ./gradlew test --stacktrace
 
     - name: Validate signing secrets
+      env:
+        KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       run: |
-        test -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" || (echo "Missing secret: ANDROID_KEYSTORE_BASE64" && exit 1)
-        test -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" || (echo "Missing secret: ANDROID_KEYSTORE_PASSWORD" && exit 1)
-        test -n "${{ secrets.ANDROID_KEY_ALIAS }}" || (echo "Missing secret: ANDROID_KEY_ALIAS" && exit 1)
-        test -n "${{ secrets.ANDROID_KEY_PASSWORD }}" || (echo "Missing secret: ANDROID_KEY_PASSWORD" && exit 1)
+        test -n "$KEYSTORE_BASE64"   || (echo "Missing secret: ANDROID_KEYSTORE_BASE64" && exit 1)
+        test -n "$KEYSTORE_PASSWORD" || (echo "Missing secret: ANDROID_KEYSTORE_PASSWORD" && exit 1)
+        test -n "$KEY_ALIAS"         || (echo "Missing secret: ANDROID_KEY_ALIAS" && exit 1)
+        test -n "$KEY_PASSWORD"      || (echo "Missing secret: ANDROID_KEY_PASSWORD" && exit 1)
 
     - name: Decode signing keystore
+      env:
+        KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       run: |
-        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > kyuubimask-release.jks
-        ls -lh kyuubimask-release.jks
+        echo "$KEYSTORE_BASE64" | base64 -d > app-release.jks
+        ls -lh app-release.jks
 
     - name: Build Release APK (signed)
       env:
-        ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/kyuubimask-release.jks
+        ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/app-release.jks
         ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -109,47 +116,20 @@ jobs:
         tag_name: ${{ steps.get_version.outputs.VERSION }}
         files: app/build/outputs/apk/release/app-release.apk
         body: |
-          ## KyuubiMask ${{ steps.get_version.outputs.VERSION }}
-
-          Privacy-first notification masking for everyday use.
+          ## ${{ github.event.repository.name }} ${{ steps.get_version.outputs.VERSION }}
 
           ### 📦 Asset
           - `app-release.apk` (signed)
 
-          ### ✅ Highlights
-          - Fully offline operation (no internet permission)
-          - Notification content masking for supported apps
-          - Lightweight, always-on optimized behavior
-
           ### 📝 Changelog
-          See [CHANGELOG.md](CHANGELOG.md) for details.
+          <!-- Replace this with your release notes -->
+          - See commit history for changes
 
           ### 🔐 Security
           This build is signed and ready to install.
 
           ### ⚠️ Install Note
           Sideload only from this official repository release page.
-
-          ---
-
-          日常で使える、プライバシー重視の通知マスキングアプリです。
-
-          ### 📦 配布ファイル
-          - `app-release.apk`（署名済み）
-
-          ### ✅ 主なポイント
-          - 完全オフライン動作（インターネット権限なし）
-          - 対応アプリの通知内容をマスク
-          - 常時利用向けの軽量設計
-
-          ### 📝 変更内容
-          詳細は [CHANGELOG.md](CHANGELOG.md) を参照してください。
-
-          ### 🔐 セキュリティ
-          このビルドは署名済みで、そのままインストールできます。
-
-          ### ⚠️ インストール時の注意
-          APK は公式リリースページからのみ取得してください。
         draft: false
         prerelease: false
       env:
@@ -157,5 +137,5 @@ jobs:
 
     - name: Cleanup signing keystore
       if: always()
-      run: rm -f kyuubimask-release.jks
+      run: rm -f app-release.jks
     
