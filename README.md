@@ -119,8 +119,7 @@ defaultConfig {
 }
 ```
 
-Also update the `package` attribute in `app/src/main/AndroidManifest.xml`  
-and rename the package directory under `app/src/main/java/`.
+Also rename the package directory under `app/src/main/java/`.
 
 ---
 
@@ -280,7 +279,6 @@ defaultConfig {
 }
 ```
 
-合わせて `app/src/main/AndroidManifest.xml` の `package` 属性と  
 `app/src/main/java/` 以下のパッケージ名も変更してください。
 
 ---
