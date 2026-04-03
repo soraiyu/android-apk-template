@@ -65,6 +65,9 @@ Run **generate-keystore.yml** once when you first set up the repository.
 
    Verify they were registered under **Settings → Secrets and variables → Actions**.
 
+   > [!NOTE]
+   > Re-running this workflow overwrites the existing values of these repository Secrets.
+
 ---
 
 ## Step ② — Debug build (runs automatically on push)
@@ -237,6 +240,9 @@ Android アプリ開発の出発点として使えるテンプレートです。
    | `ANDROID_DEBUG_KEYSTORE_BASE64` | デバッグ用キーストア（Base64） |
 
    登録されたかどうかは **Settings → Secrets and variables → Actions** で確認できます。
+
+   > [!NOTE]
+   > このワークフローを再実行すると、既存の Secrets の値が上書きされます。
 
 ---
 
