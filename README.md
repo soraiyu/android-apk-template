@@ -65,10 +65,8 @@ Run **generate-keystore.yml** once when you first set up the repository.
 
    Verify they were registered under **Settings → Secrets and variables → Actions**.
 
-   > ⚠️ The keystore files are **not** stored in the repository. If you lose the release
-   > keystore after publishing to Google Play, you'll need to generate a new one and
-   > bump the app's `applicationId`. Running this workflow again will **overwrite** the
-   > existing Secrets.
+   > [!NOTE]
+   > Re-running this workflow overwrites the existing values of these repository Secrets.
 
 ---
 
@@ -243,7 +241,8 @@ Android アプリ開発の出発点として使えるテンプレートです。
 
    登録されたかどうかは **Settings → Secrets and variables → Actions** で確認できます。
 
-   > ⚠️ キーストアファイルはリポジトリに保存されません。Google Play 公開後にリリースキーストアを失った場合は、新しく生成し `applicationId` を変更する必要があります。このワークフローを再実行すると既存の Secrets が**上書き**されます。
+   > [!NOTE]
+   > このワークフローを再実行すると、既存の Secrets の値が上書きされます。
 
 ---
 
