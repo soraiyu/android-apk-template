@@ -1,155 +1,166 @@
 # 📦 Android APK Template
 
-> **Build & ship signed Android APKs — entirely in GitHub Actions. No Android Studio required.**
+### Build & ship signed Android APKs — 100% in GitHub Actions. No Android Studio needed.
 
-[![Android CI](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/android-ci.yml?label=Debug%20Build&logo=android)](https://github.com/soraiyu/android-apk-template/actions/workflows/android-ci.yml)
-[![Release](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/release.yml?label=Release%20Build&logo=android)](https://github.com/soraiyu/android-apk-template/actions/workflows/release.yml)
-[![AGP](https://img.shields.io/badge/AGP-8.7.x-blue?logo=gradle)](https://developer.android.com/build/releases/gradle-plugin)
+[![Debug Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/android-ci.yml?label=Debug%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/android-ci.yml)
+[![Release Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/release.yml?label=Release%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/release.yml)
+[![AGP 8.7](https://img.shields.io/badge/AGP-8.7.x-blue?logo=gradle&logoColor=white)](https://developer.android.com/build/releases/gradle-plugin)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Min SDK 26](https://img.shields.io/badge/minSdk-26-orange?logo=android&logoColor=white)](https://developer.android.com/tools/releases/platforms)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> 🔑 **The killer feature:** Run one workflow → keystore auto-generated → all signing secrets auto-registered. Zero manual keytool commands.
 
 ---
 
 ## ✨ Why this template?
 
-| 🙋 You are… | ✅ This template helps because… |
+| 🙋 You are… | ✅ This template delivers… |
 |---|---|
-| Tired of installing Android Studio on a slow PC | Everything runs in GitHub Actions — zero local setup needed |
-| Building a side project or quick prototype | Minimal boilerplate, ready to build in minutes |
-| New to Android signing / keystores | **Keystore is auto-generated and saved as Secrets** — no manual keytool commands |
-| Shipping to friends or testers | Download signed APKs straight from the Actions Artifacts tab |
-| Security-conscious | All third-party Actions are pinned to immutable commit SHAs |
+| On a slow/low-spec PC, can't run Android Studio | **Zero local setup** — GitHub Actions handles everything |
+| Starting a side project or quick prototype | Minimal boilerplate, push-to-build in minutes |
+| Struggling with Android keystores & signing | **Auto-generated keystore + secrets** — no keytool required |
+| Shipping APKs to friends, testers, or yourself | Download signed APKs directly from the Actions Artifacts tab |
+| Security-aware | All third-party Actions pinned to immutable commit SHAs |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 How it works — 5 minutes to your first signed APK
 
 ```
-Use this template → Add one Secret (GH_PAT) → Run generate-keystore → Push code → Download APK
+① Use this template  →  ② Add GH_PAT secret  →  ③ Run generate-keystore
+→  ④ Push your code   →  ⑤ Download signed APK from Artifacts
 ```
 
-**Total setup time: ~5 minutes.**
+<!-- screenshot: Actions tab showing all three workflows green -->
+> 📸 *Screenshot coming soon — showing the Actions tab with all three workflows passing*
 
 ---
 
 ## 🛠 Three Workflows, One Goal
 
-| Workflow | Trigger | Output | Retention |
+| Workflow | Trigger | Output | Kept for |
 |---|---|---|---|
-| `android-ci.yml` | Push / PR → `main` | Debug APK | 30 days |
-| `release.yml` | Manual or `v*` tag push | **Signed** release APK + GitHub Release | 90 days |
-| `generate-keystore.yml` | Manual (once) | Keystore auto-saved as repository Secrets | — |
+| `android-ci.yml` | Every push / PR → `main` | Debug APK | 30 days |
+| `release.yml` | Manual **or** push a `v*` tag | **Signed** release APK + GitHub Release | 90 days |
+| `generate-keystore.yml` | Manual — **run once** | Keystore auto-saved as repo Secrets | — |
 
 ---
 
-## ⚡ Step 0 — Customize your app ID
+## ⚡ Step 0 — Set your app ID first
 
-> **Do this first** — before running any workflow.
+> Do this before running any workflow.
 
-Edit `app/build.gradle.kts`:
+Open **`app/build.gradle.kts`** and change:
 
 ```kotlin
-defaultConfig {
-    applicationId = "com.yourname.yourapp"  // ← change from com.example.myapp
-    // ...
-}
+namespace   = "com.yourname.yourapp"   // ← update here too
+applicationId = "com.yourname.yourapp" // ← main app ID
 ```
 
-Also update `namespace` at the top of the same file, and rename the package directory:
+Then rename the source directory to match:
 
 ```
-app/src/main/java/com/example/myapp/  →  app/src/main/java/com/yourname/yourapp/
+app/src/main/java/com/example/myapp/
+              ↓
+app/src/main/java/com/yourname/yourapp/
 ```
 
 ---
 
-## 🔑 Step 1 — One-time setup: create `GH_PAT`
+## 🔑 Step 1 — Create `GH_PAT` (one-time, ~2 min)
 
-> GitHub's built-in `GITHUB_TOKEN` cannot write repository Secrets. You need a Personal Access Token once.
+GitHub's built-in `GITHUB_TOKEN` can't write repository Secrets — you need a Personal Access Token once.
 
-1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
-2. Click **"Generate new token"**
-3. **Repository access** → *Only select repositories* → choose this repo
-4. **Permissions → Repository permissions → Secrets** → set to **Read and write**
-5. Click **"Generate token"** — copy the value
-6. In your repo: **Settings → Secrets and variables → Actions → New repository secret**
-   - Name: `GH_PAT` — Value: paste the token → **"Add secret"**
+1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**
+2. Scope: *Only select repositories* → pick this repo
+3. **Permissions → Repository permissions → Secrets → Read and write**
+4. Generate, copy the token
+5. **Repo → Settings → Secrets and variables → Actions → New repository secret**
+   Name: `GH_PAT` · Value: *paste token* → **Add secret**
 
-> ✅ Done. This is a one-time step. After this everything runs automatically.
+> ✅ One-time only. Everything after this is fully automated.
 
 ---
 
 ## 🗝 Step 2 — Generate your keystore (auto-saves Secrets)
 
-Run **"Generate Android Keystores"** once from the Actions tab:
+**Actions → "Generate Android Keystores" → Run workflow**
 
-1. **Actions** → **"Generate Android Keystores"** → **"Run workflow"**
-2. Fill in optional fields (all have sensible defaults):
+All fields have sensible defaults — just click Run if you're unsure:
 
-   | Input | Default | Description |
-   |---|---|---|
-   | `key_alias` | `release` | Key alias |
-   | `key_cn` | repo name | Common Name |
-   | `key_o` | owner name | Organization |
-   | `key_c` | `US` | Country code |
-   | `validity_days` | `10000` (~27 yrs) | Key validity |
+| Input | Default | Notes |
+|---|---|---|
+| `key_alias` | `release` | Name for the signing key |
+| `key_cn` | repo name | Certificate Common Name |
+| `key_o` | owner name | Organization field |
+| `key_c` | `US` | ISO country code |
+| `validity_days` | `10000` (~27 yrs) | How long the cert is valid |
 
-3. The workflow automatically registers these Secrets — **no copy-paste needed**:
+After the workflow finishes, these Secrets appear automatically — **no copy-paste needed**:
 
-   | Secret | Description |
-   |---|---|
-   | `ANDROID_KEYSTORE_BASE64` | Release keystore (Base64-encoded) |
-   | `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
-   | `ANDROID_KEY_ALIAS` | Key alias |
-   | `ANDROID_KEY_PASSWORD` | Key password |
-   | `ANDROID_DEBUG_KEYSTORE_BASE64` | Debug keystore (consistent cert across builds) |
+| Secret | What it contains |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | Release keystore (Base64-encoded) |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Key alias |
+| `ANDROID_KEY_PASSWORD` | Key password |
+| `ANDROID_DEBUG_KEYSTORE_BASE64` | Debug keystore (same cert on every build) |
 
-   Confirm at **Settings → Secrets and variables → Actions**.
+Verify at **Settings → Secrets and variables → Actions**.
+
+<!-- screenshot: Settings → Secrets page showing the five ANDROID_* secrets registered -->
+> 📸 *Screenshot coming soon — showing the five `ANDROID_*` secrets registered in repo Settings*
 
 > [!NOTE]
-> Re-running this workflow overwrites the existing Secrets with a new keystore.
+> Re-running this workflow replaces all five Secrets with a freshly generated keystore.
 
 ---
 
-## 🔨 Step 3 — Debug build (automatic on every push)
+## 🔨 Step 3 — Debug build (automatic)
 
-Push code to `main` — that's it.
+Push anything to `main` and the debug build runs on its own.
 
-- **Workflow**: `android-ci.yml` triggers on push / PR to `main`, `master`, or `develop`
-- **Artifact**: `app-debug` → `app-debug.apk` (30-day retention)
-- If `ANDROID_DEBUG_KEYSTORE_BASE64` is set, every build uses the same signing certificate
+- **Trigger**: push or PR to `main`, `master`, or `develop`
+- **Download**: Actions → job → Artifacts → **`app-debug`** → `app-debug.apk`
+- **Retention**: 30 days
+- If `ANDROID_DEBUG_KEYSTORE_BASE64` is set, the same signing certificate is used every time
 
 ---
 
 ## 📦 Step 4 — Signed release build
 
-**Option A — Manual:**
-1. **Actions** → **"Release Build"** → **"Run workflow"**
-2. Enter a version tag (e.g. `v1.0.0`) and run
+**Option A — click to release:**
+1. **Actions → "Release Build" → Run workflow**
+2. Enter a version tag like `v1.0.0` → Run
 
-**Option B — Tag push (automatic):**
+**Option B — tag to release (fully automatic):**
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
+# → workflow triggers, APK built and attached to a GitHub Release automatically
 ```
-GitHub automatically builds and attaches the APK to a **GitHub Release**.
 
-> **Prerequisite**: Secrets from Step 2 must be registered first.
+- **Download**: Actions → job → Artifacts → **`app-release-signed`** → `app-release.apk`
+- **Retention**: 90 days
+- The APK is also attached to a **GitHub Release** on the Releases page
 
-- **Artifact**: `app-release-signed` → `app-release.apk` (signed, 90-day retention)
+<!-- screenshot: GitHub Release page showing the attached app-release.apk asset -->
+> 📸 *Screenshot coming soon — showing a GitHub Release with the signed APK attached*
+
+> **Prerequisite**: Secrets from Step 2 must be registered before running this.
 
 ---
 
 ## 🏗 Build locally (optional)
 
-If you have Java 17+ installed, you can build without Android Studio:
+No Android Studio needed — just Java 17+:
 
 ```bash
-# Debug APK
+# Debug APK → app/build/outputs/apk/debug/app-debug.apk
 ./gradlew assembleDebug
-# Output: app/build/outputs/apk/debug/app-debug.apk
 
-# Release APK (requires signing env vars)
+# Release APK (needs signing env vars set — normally handled by CI)
 ./gradlew assembleRelease
 ```
 
@@ -162,21 +173,19 @@ If you have Java 17+ installed, you can build without Android Studio:
 ├── app/
 │   ├── build.gradle.kts         # ← App ID, SDK versions, signing config
 │   ├── proguard-rules.pro
-│   └── src/
-│       ├── main/
-│       │   ├── AndroidManifest.xml
-│       │   ├── java/com/example/myapp/
-│       │   │   └── MainActivity.kt
-│       │   └── res/
-│       └── test/
+│   └── src/main/
+│       ├── AndroidManifest.xml
+│       ├── java/com/example/myapp/
+│       │   └── MainActivity.kt
+│       └── res/
 ├── build.gradle.kts             # Root build config
 ├── settings.gradle.kts
 ├── gradle.properties
 ├── gradlew / gradlew.bat
 └── .github/workflows/
-    ├── android-ci.yml           # Auto debug build
+    ├── android-ci.yml           # Auto debug build on push
     ├── release.yml              # Signed release build
-    └── generate-keystore.yml   # Keystore generation + secret registration
+    └── generate-keystore.yml   # One-time keystore + secret setup
 ```
 
 ---
@@ -184,17 +193,17 @@ If you have Java 17+ installed, you can build without Android Studio:
 <details>
 <summary>🔒 Security: why Actions are pinned to commit SHAs</summary>
 
-Workflow files reference Actions like this:
+Workflows in this template reference Actions like this:
 
 ```yaml
 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
 ```
 
 **Why not `@v4`?**  
-A version tag is a mutable pointer — the action author can silently redirect it to different code at any time. If that happens via an accident or supply-chain attack, every repo using `@v4` would execute the attacker's code with full access to your Secrets on the next run.
+Version tags are mutable — the action author can silently point `v4` at entirely different code. If that happens (accident, compromised account, or supply-chain attack), every repo using `@v4` would execute the attacker's code on the next run — with full access to your repository Secrets.
 
 **Why a SHA is safer**  
-A commit SHA is immutable. Pinning to a SHA guarantees you run exactly the code you audited — nothing more. The human-readable tag stays as a comment (`# v4`) so you can identify the version at a glance.
+A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly the code you reviewed. The human-readable tag stays as a comment so you know which version you're on.
 
 📖 [GitHub Docs: Security hardening for GitHub Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)
 
@@ -209,86 +218,159 @@ A commit SHA is immutable. Pinning to a SHA guarantees you run exactly the code 
 
 **Android Studio不要** — GitHub Actions だけで署名済みAPKを自動ビルドできる最小構成テンプレートです。
 
+> 🔑 **一番の売り：** ワークフローを1回実行するだけで、keystoreが自動生成されてすべての署名Secretsが自動登録されます。keytoolコマンドは一切不要。
+
 ### こんな方におすすめ
 
-- 🐢 **Android Studioが重くて使いたくない人**（非力PC勢）
-- ⚡ **GitHub Actionsだけで完結させたい人**
-- 🔑 **署名済みAPKを簡単に作りたい人**（keystoreの自動生成が一番の売り）
-- 🚀 **最小構成でサクッとAndroidアプリを始めたい人**
+| 🙋 こんな方に | ✅ このテンプレートが解決します |
+|---|---|
+| 非力PCでAndroid Studioが重くて使えない | **ローカル環境不要** — GitHub Actionsが全部やってくれる |
+| サイドプロジェクトをさっさと始めたい | 最小構成ですぐbuild可能 |
+| keystoreや署名の仕組みがわからない | **keystore自動生成＋Secrets自動登録** — keytool不要 |
+| 友人・テスター・自分にAPKを配りたい | ActionsのArtifactsタブから署名済みAPKをダウンロード |
+| セキュリティを意識している | サードパーティActionを全てコミットSHAでピン留め |
 
 ### ワークフロー一覧
 
-| ワークフロー | トリガー | 出力 |
-|---|---|---|
-| `android-ci.yml` | `main` への Push / PR | デバッグ APK（30日保存） |
-| `release.yml` | 手動 または `v*` タグ push | 署名済みリリース APK + GitHub Release（90日保存） |
-| `generate-keystore.yml` | 手動（初回のみ） | キーストア＋パスワードを Secrets に自動登録 |
+| ワークフロー | トリガー | 出力 | 保存期間 |
+|---|---|---|---|
+| `android-ci.yml` | `main` への Push / PR | デバッグ APK | 30日 |
+| `release.yml` | 手動 または `v*` タグ push | **署名済み**リリース APK + GitHub Release | 90日 |
+| `generate-keystore.yml` | 手動（**初回のみ**） | キーストア＋Secretsを自動登録 | — |
 
 ### ステップ 0 — アプリIDの変更（最初にやること）
 
-`app/build.gradle.kts` を編集:
+**`app/build.gradle.kts`** を開いて変更:
 
 ```kotlin
-defaultConfig {
-    applicationId = "com.yourname.yourapp"  // ← com.example.myapp から変更
-}
+namespace   = "com.yourname.yourapp"   // ← ここも変更
+applicationId = "com.yourname.yourapp" // ← メインのアプリID
 ```
 
-`app/src/main/java/` 以下のパッケージディレクトリ名も合わせて変更してください。
+ソースディレクトリ名も合わせて変更:
 
-### ステップ 1 — `GH_PAT` の作成（初回のみ）
+```
+app/src/main/java/com/example/myapp/
+              ↓
+app/src/main/java/com/yourname/yourapp/
+```
 
-> `GITHUB_TOKEN` はリポジトリの Secrets に書き込めないため、Fine-grained PAT が必要です。
+### ステップ 1 — `GH_PAT` の作成（初回のみ、約2分）
 
-1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
-2. **「Generate new token」** をクリック
-3. **Repository access** → このリポジトリを選択
-4. **Permissions → Secrets → Read and write**
-5. トークンを生成してコピー
-6. リポジトリの **Settings → Secrets → New secret** → 名前: `GH_PAT`、値: コピーしたトークン
+`GITHUB_TOKEN` はリポジトリのSecretsに書き込めないため、Personal Access Tokenが1回だけ必要です。
 
-### ステップ 2 — キーストアの自動生成
+1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**
+2. *Only select repositories* → このリポジトリを選択
+3. **Permissions → Repository permissions → Secrets → Read and write**
+4. トークンを生成してコピー
+5. **リポジトリ → Settings → Secrets and variables → Actions → New repository secret**
+   名前: `GH_PAT` · 値: コピーしたトークン → **Add secret**
 
-Actions タブから **「Generate Android Keystores」** を手動実行するだけ。  
-以下の Secrets が**自動的に登録**されます（手動コピー不要）：
+> ✅ 初回のみの作業です。以降はすべて自動で動きます。
 
-| Secret 名 | 内容 |
+### ステップ 2 — キーストアの自動生成（Secrets自動登録）
+
+**Actions → "Generate Android Keystores" → Run workflow**
+
+すべての入力項目にデフォルト値があるので、迷ったらそのまま Run でOKです:
+
+| 入力項目 | デフォルト | 説明 |
+|---|---|---|
+| `key_alias` | `release` | 署名キーの名前 |
+| `key_cn` | リポジトリ名 | 証明書のCommon Name |
+| `key_o` | オーナー名 | 組織名 |
+| `key_c` | `US` | ISO国コード |
+| `validity_days` | `10000`（約27年） | 証明書の有効期間 |
+
+ワークフロー完了後、以下のSecretsが**自動的に登録**されます（手動コピー不要）:
+
+| Secret名 | 内容 |
 |---|---|
-| `ANDROID_KEYSTORE_BASE64` | リリース用キーストア |
+| `ANDROID_KEYSTORE_BASE64` | リリース用キーストア（Base64） |
 | `ANDROID_KEYSTORE_PASSWORD` | キーストアパスワード |
 | `ANDROID_KEY_ALIAS` | キーエイリアス |
 | `ANDROID_KEY_PASSWORD` | キーパスワード |
-| `ANDROID_DEBUG_KEYSTORE_BASE64` | デバッグ用キーストア |
+| `ANDROID_DEBUG_KEYSTORE_BASE64` | デバッグ用キーストア（毎回同じ証明書） |
+
+**Settings → Secrets and variables → Actions** で確認できます。
+
+> [!NOTE]
+> このワークフローを再実行すると、5つのSecretsがすべて新しいキーストアで上書きされます。
 
 ### ステップ 3 — デバッグビルド（自動）
 
-`main` ブランチに push するだけ。Actions タブの **「Android CI」** が緑になったら、  
-Artifacts セクションから `app-debug.apk` をダウンロードできます。
+`main` ブランチに push するだけで自動でビルドされます。
+
+- **トリガー**: `main`、`master`、`develop` へのpush または PR
+- **ダウンロード**: Actions → ジョブ → Artifacts → **`app-debug`** → `app-debug.apk`
+- **保存期間**: 30日間
+- `ANDROID_DEBUG_KEYSTORE_BASE64` を登録していれば、毎回同じ証明書でビルドされます
 
 ### ステップ 4 — 署名済みリリースビルド
 
-**手動実行**: Actions → **「Release Build」** → **「Run workflow」** → バージョンタグを入力して実行
+**方法A — 手動実行:**
+1. **Actions → "Release Build" → Run workflow**
+2. バージョンタグ（例: `v1.0.0`）を入力して Run
 
-**タグ push で自動実行**:
+**方法B — タグpushで自動実行:**
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
+# → ワークフローが自動起動し、GitHub Releaseに署名済みAPKが添付される
 ```
-GitHub Releases に自動で APK が添付されます。
+
+- **ダウンロード**: Actions → ジョブ → Artifacts → **`app-release-signed`** → `app-release.apk`
+- **保存期間**: 90日間
+- Releasesページの **GitHub Release** にもAPKが自動添付されます
+
+> **前提**: ステップ2のSecretsが登録済みであること。
 
 ### ローカルビルド（任意）
 
-Java 17 があればAndroid Studio不要でビルド可能:
+Java 17以上があればAndroid Studio不要でビルドできます:
 
 ```bash
-./gradlew assembleDebug   # デバッグAPK
-./gradlew assembleRelease # リリースAPK（署名環境変数が必要）
+# デバッグAPK → app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleDebug
+
+# リリースAPK（署名用の環境変数が必要 — 通常はCIが処理）
+./gradlew assembleRelease
+```
+
+### ファイル構成
+
+```
+.
+├── app/
+│   ├── build.gradle.kts         # ← アプリID・SDKバージョン・署名設定
+│   ├── proguard-rules.pro
+│   └── src/main/
+│       ├── AndroidManifest.xml
+│       ├── java/com/example/myapp/
+│       │   └── MainActivity.kt
+│       └── res/
+├── build.gradle.kts             # ルートビルド設定
+├── settings.gradle.kts
+├── gradle.properties
+├── gradlew / gradlew.bat
+└── .github/workflows/
+    ├── android-ci.yml           # push時の自動デバッグビルド
+    ├── release.yml              # 署名済みリリースビルド
+    └── generate-keystore.yml   # キーストア生成＋Secret登録（初回のみ）
 ```
 
 ### セキュリティについて
 
-このテンプレートのワークフローはサードパーティの Action をすべて**コミットSHA**でピン留めしています。  
-バージョンタグ（`@v4` など）は可変ポインターのため、サプライチェーン攻撃のリスクがあります。  
-SHA は不変なので、レビューしたコードだけが実行されることを保証できます。
+このテンプレートのワークフローはサードパーティのActionをすべて**コミットSHA**でピン留めしています。
+
+```yaml
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
+```
+
+`@v4` のようなバージョンタグは可変ポインターのため、リポジトリオーナーがいつでも別のコードに差し替えられます。サプライチェーン攻撃やアカウント侵害が起きた場合、`@v4` を使っている全プロジェクトで次回実行時に攻撃者のコードが動きます（リポジトリのSecretsに完全アクセスした状態で）。
+
+コミットSHAは不変なので、レビュー済みのコードだけが実行されることを保証できます。コメント（`# v4`）でバージョンも一目でわかります。
+
+📖 [GitHub Actions セキュリティ強化ガイド](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)（GitHub公式）
 
 </details>
