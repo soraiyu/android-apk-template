@@ -1,6 +1,6 @@
 # 📦 Android APK Template
 
-### Build & ship signed Android APKs — 100% in GitHub Actions. No Android Studio needed.
+### No Android Studio. No keytool. No hassle. — Build & ship signed APKs entirely in GitHub Actions.
 
 [![Debug Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/android-ci.yml?label=Debug%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/android-ci.yml)
 [![Release Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/release.yml?label=Release%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/release.yml)
@@ -8,6 +8,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 [![Min SDK 26](https://img.shields.io/badge/minSdk-26-orange?logo=android&logoColor=white)](https://developer.android.com/tools/releases/platforms)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/soraiyu/android-apk-template?style=social)](https://github.com/soraiyu/android-apk-template/stargazers)
 
 > 🔑 **The killer feature:** Run one workflow → keystore auto-generated → all signing secrets auto-registered. Zero manual keytool commands.
 
@@ -32,8 +33,9 @@
 →  ④ Push your code   →  ⑤ Download signed APK from Artifacts
 ```
 
-<!-- screenshot: Actions tab showing all three workflows green -->
-> 📸 *Screenshot coming soon — showing the Actions tab with all three workflows passing*
+<!-- 📸 Replace with your screenshot: docs/screenshots/actions-workflows.png
+     Show the Actions tab with all three workflows (android-ci, release, generate-keystore) showing green ✅ -->
+![Actions tab — all three workflows passing](docs/screenshots/actions-workflows.png)
 
 ---
 
@@ -51,11 +53,13 @@
 
 > Do this before running any workflow.
 
-Open **`app/build.gradle.kts`** and change:
+Open **`app/build.gradle.kts`** and update both lines:
 
-```kotlin
-namespace   = "com.yourname.yourapp"   // ← update here too
-applicationId = "com.yourname.yourapp" // ← main app ID
+```diff
+- namespace   = "com.example.myapp"
+- applicationId = "com.example.myapp"
++ namespace   = "com.yourname.yourapp"
++ applicationId = "com.yourname.yourapp"
 ```
 
 Then rename the source directory to match:
@@ -72,11 +76,10 @@ app/src/main/java/com/yourname/yourapp/
 
 GitHub's built-in `GITHUB_TOKEN` can't write repository Secrets — you need a Personal Access Token once.
 
-1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**
-2. Scope: *Only select repositories* → pick this repo
-3. **Permissions → Repository permissions → Secrets → Read and write**
-4. Generate, copy the token
-5. **Repo → Settings → Secrets and variables → Actions → New repository secret**
+1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
+2. Click **Generate new token** · Scope: *Only select repositories* → pick this repo
+3. **Permissions → Repository permissions → Secrets → Read and write** · Generate & copy the token
+4. **Repo → Settings → Secrets and variables → Actions → New repository secret**
    Name: `GH_PAT` · Value: *paste token* → **Add secret**
 
 > ✅ One-time only. Everything after this is fully automated.
@@ -108,9 +111,6 @@ After the workflow finishes, these Secrets appear automatically — **no copy-pa
 | `ANDROID_DEBUG_KEYSTORE_BASE64` | Debug keystore (same cert on every build) |
 
 Verify at **Settings → Secrets and variables → Actions**.
-
-<!-- screenshot: Settings → Secrets page showing the five ANDROID_* secrets registered -->
-> 📸 *Screenshot coming soon — showing the five `ANDROID_*` secrets registered in repo Settings*
 
 > [!NOTE]
 > Re-running this workflow replaces all five Secrets with a freshly generated keystore.
@@ -145,8 +145,9 @@ git push origin v1.0.0
 - **Retention**: 90 days
 - The APK is also attached to a **GitHub Release** on the Releases page
 
-<!-- screenshot: GitHub Release page showing the attached app-release.apk asset -->
-> 📸 *Screenshot coming soon — showing a GitHub Release with the signed APK attached*
+<!-- 📸 Replace with your screenshot: docs/screenshots/github-release.png
+     Show the GitHub Release page with the signed app-release.apk listed as an asset -->
+![GitHub Release — signed APK attached as asset](docs/screenshots/github-release.png)
 
 > **Prerequisite**: Secrets from Step 2 must be registered before running this.
 
@@ -240,11 +241,13 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 
 ### ステップ 0 — アプリIDの変更（最初にやること）
 
-**`app/build.gradle.kts`** を開いて変更:
+**`app/build.gradle.kts`** を開いて両方の行を変更:
 
-```kotlin
-namespace   = "com.yourname.yourapp"   // ← ここも変更
-applicationId = "com.yourname.yourapp" // ← メインのアプリID
+```diff
+- namespace   = "com.example.myapp"
+- applicationId = "com.example.myapp"
++ namespace   = "com.yourname.yourapp"
++ applicationId = "com.yourname.yourapp"
 ```
 
 ソースディレクトリ名も合わせて変更:
@@ -259,11 +262,10 @@ app/src/main/java/com/yourname/yourapp/
 
 `GITHUB_TOKEN` はリポジトリのSecretsに書き込めないため、Personal Access Tokenが1回だけ必要です。
 
-1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**
-2. *Only select repositories* → このリポジトリを選択
-3. **Permissions → Repository permissions → Secrets → Read and write**
-4. トークンを生成してコピー
-5. **リポジトリ → Settings → Secrets and variables → Actions → New repository secret**
+1. **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
+2. **Generate new token** をクリック · *Only select repositories* → このリポジトリを選択
+3. **Permissions → Repository permissions → Secrets → Read and write** · 生成してコピー
+4. **リポジトリ → Settings → Secrets and variables → Actions → New repository secret**
    名前: `GH_PAT` · 値: コピーしたトークン → **Add secret**
 
 > ✅ 初回のみの作業です。以降はすべて自動で動きます。
