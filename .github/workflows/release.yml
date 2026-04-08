@@ -18,8 +18,6 @@ jobs:
   release:
     name: Build Release APK
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - name: Validate workflow_dispatch inputs
@@ -136,6 +134,7 @@ jobs:
         prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # softprops/action-gh-release still targets node20; opt into node24 to suppress deprecation warning
 
     - name: Cleanup signing keystore
       if: always()
