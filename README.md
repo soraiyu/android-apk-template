@@ -33,9 +33,7 @@
 →  ④ Push your code   →  ⑤ Download signed APK from Artifacts
 ```
 
-<!-- 📸 Replace with your screenshot: docs/screenshots/actions-workflows.png
-     Show the Actions tab with all three workflows (android-ci, release, generate-keystore) showing green ✅ -->
-![Actions tab — all three workflows passing](docs/screenshots/actions-workflows.png)
+![Actions tab — Android CI, Generate Android Keystores, and Release Build listed](https://github.com/user-attachments/assets/58296361-aa50-4c29-be0d-3cc00684100e)
 
 ---
 
@@ -112,6 +110,8 @@ After the workflow finishes, these Secrets appear automatically — **no copy-pa
 
 Verify at **Settings → Secrets and variables → Actions**.
 
+![Generate Android Keystores — workflow sidebar showing the three key workflows](https://github.com/user-attachments/assets/41e0da8a-2085-482e-a6c0-98f8baf2462f)
+
 > [!NOTE]
 > Re-running this workflow replaces all five Secrets with a freshly generated keystore.
 
@@ -145,10 +145,6 @@ git push origin v1.0.0
 - **Retention**: 90 days
 - The APK is also attached to a **GitHub Release** on the Releases page
 
-<!-- 📸 Replace with your screenshot: docs/screenshots/github-release.png
-     Show the GitHub Release page with the signed app-release.apk listed as an asset -->
-![GitHub Release — signed APK attached as asset](docs/screenshots/github-release.png)
-
 > **Prerequisite**: Secrets from Step 2 must be registered before running this.
 
 ---
@@ -176,7 +172,7 @@ No Android Studio needed — just Java 17+:
 │   ├── proguard-rules.pro
 │   └── src/main/
 │       ├── AndroidManifest.xml
-│       ├── java/com/example/myapp/
+│       ├── java/com/yourname/yourapp/
 │       │   └── MainActivity.kt
 │       └── res/
 ├── build.gradle.kts             # Root build config
@@ -348,7 +344,7 @@ Java 17以上があればAndroid Studio不要でビルドできます:
 │   ├── proguard-rules.pro
 │   └── src/main/
 │       ├── AndroidManifest.xml
-│       ├── java/com/example/myapp/
+│       ├── java/com/yourname/yourapp/
 │       │   └── MainActivity.kt
 │       └── res/
 ├── build.gradle.kts             # ルートビルド設定
