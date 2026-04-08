@@ -41,7 +41,7 @@
 
 | Workflow | Trigger | Output | Kept for |
 |---|---|---|---|
-| `android-ci.yml` | Every push / PR → `main` | Debug APK | 30 days |
+| `android-ci.yml` | Push / PR on `main`, `master`, `develop` (**paths filtered** — Android/build files only) | Debug APK | 30 days |
 | `release.yml` | Manual **or** push a `v*` tag | **Signed** release APK + GitHub Release | 90 days |
 | `generate-keystore.yml` | Manual — **run once** | Keystore auto-saved as repo Secrets | — |
 
@@ -60,12 +60,18 @@ Open **`app/build.gradle.kts`** and update both lines:
 + applicationId = "com.yourname.yourapp"
 ```
 
-Then rename the source directory to match:
+Then rename the source directory to match, and update the `package` declaration inside each Kotlin file:
 
 ```
-app/src/main/java/com/example/myapp/
-              ↓
-app/src/main/java/com/yourname/yourapp/
+app/src/main/java/com/example/myapp/   →   app/src/main/java/com/yourname/yourapp/
+app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/yourapp/
+```
+
+Also update the first line of every `.kt` file:
+
+```diff
+- package com.example.myapp
++ package com.yourname.yourapp
 ```
 
 ---
@@ -119,9 +125,11 @@ Verify at **Settings → Secrets and variables → Actions**.
 
 ## 🔨 Step 3 — Debug build (automatic)
 
-Push anything to `main` and the debug build runs on its own.
+Push Android/build file changes to `main` and the debug build runs on its own.
 
-- **Trigger**: push or PR to `main`, `master`, or `develop`
+> **Note:** `android-ci.yml` uses `paths` filters. Pushes that touch only unrelated files (e.g., README edits) will not trigger the workflow — that is expected behavior.
+
+- **Trigger**: push or PR to `main`, `master`, or `develop` when the changed files match the path filters
 - **Download**: Actions → job → Artifacts → **`app-debug`** → `app-debug.apk`
 - **Retention**: 30 days
 - If `ANDROID_DEBUG_KEYSTORE_BASE64` is set, the same signing certificate is used every time
@@ -131,8 +139,11 @@ Push anything to `main` and the debug build runs on its own.
 ## 📦 Step 4 — Signed release build
 
 **Option A — click to release:**
-1. **Actions → "Release Build" → Run workflow**
-2. Enter a version tag like `v1.0.0` → Run
+1. Push and create the tag first: `git tag v1.0.0 && git push origin v1.0.0`
+2. **Actions → "Release Build" → Run workflow**
+3. Enter the tag you just pushed (e.g. `v1.0.0`) → Run
+
+> **Important:** Manual dispatch checks out the tag you enter. The tag **must already exist** in the repo before you run the workflow, or the checkout step will fail.
 
 **Option B — tag to release (fully automatic):**
 ```bash
@@ -151,7 +162,7 @@ git push origin v1.0.0
 
 ## 🏗 Build locally (optional)
 
-No Android Studio needed — just Java 17+:
+Requires **Java 17+** and the **Android SDK** (command-line tools, platform, and build-tools) — GitHub-hosted runners have these pre-installed, but you need to install the SDK locally if it isn't already set up ([Android SDK setup guide](https://developer.android.com/tools)):
 
 ```bash
 # Debug APK → app/build/outputs/apk/debug/app-debug.apk
@@ -193,11 +204,11 @@ No Android Studio needed — just Java 17+:
 Workflows in this template reference Actions like this:
 
 ```yaml
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 ```
 
-**Why not `@v4`?**  
-Version tags are mutable — the action author can silently point `v4` at entirely different code. If that happens (accident, compromised account, or supply-chain attack), every repo using `@v4` would execute the attacker's code on the next run — with full access to your repository Secrets.
+**Why not `@v6`?**  
+Version tags are mutable — the action author can silently point `v6` at entirely different code. If that happens (accident, compromised account, or supply-chain attack), every repo using `@v6` would execute the attacker's code on the next run — with full access to your repository Secrets.
 
 **Why a SHA is safer**  
 A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly the code you reviewed. The human-readable tag stays as a comment so you know which version you're on.
@@ -231,7 +242,7 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 
 | ワークフロー | トリガー | 出力 | 保存期間 |
 |---|---|---|---|
-| `android-ci.yml` | `main` への Push / PR | デバッグ APK | 30日 |
+| `android-ci.yml` | `main` / `master` / `develop` への Push / PR（**対象 `paths` の変更時のみ**） | デバッグ APK | 30日 |
 | `release.yml` | 手動 または `v*` タグ push | **署名済み**リリース APK + GitHub Release | 90日 |
 | `generate-keystore.yml` | 手動（**初回のみ**） | キーストア＋Secretsを自動登録 | — |
 
@@ -246,12 +257,18 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 + applicationId = "com.yourname.yourapp"
 ```
 
-ソースディレクトリ名も合わせて変更:
+ソースディレクトリ名も合わせて変更し、各Kotlinファイルの `package` 行も更新してください:
 
 ```
-app/src/main/java/com/example/myapp/
-              ↓
-app/src/main/java/com/yourname/yourapp/
+app/src/main/java/com/example/myapp/   →   app/src/main/java/com/yourname/yourapp/
+app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/yourapp/
+```
+
+各 `.kt` ファイルの先頭行も変更:
+
+```diff
+- package com.example.myapp
++ package com.yourname.yourapp
 ```
 
 ### ステップ 1 — `GH_PAT` の作成（初回のみ、約2分）
@@ -297,9 +314,11 @@ app/src/main/java/com/yourname/yourapp/
 
 ### ステップ 3 — デバッグビルド（自動）
 
-`main` ブランチに push するだけで自動でビルドされます。
+Android/ビルド関連ファイルを `main` ブランチに push するとデバッグビルドが自動で実行されます。
 
-- **トリガー**: `main`、`master`、`develop` へのpush または PR
+> **注意:** `android-ci.yml` には `paths` フィルタがあります。READMEだけの変更など、対象外のファイルのみを変更したpushではワークフローが起動しません（これは正常な動作です）。
+
+- **トリガー**: `main`、`master`、`develop` へのpush または PR（pathsフィルタに合致する変更のみ）
 - **ダウンロード**: Actions → ジョブ → Artifacts → **`app-debug`** → `app-debug.apk`
 - **保存期間**: 30日間
 - `ANDROID_DEBUG_KEYSTORE_BASE64` を登録していれば、毎回同じ証明書でビルドされます
@@ -307,8 +326,11 @@ app/src/main/java/com/yourname/yourapp/
 ### ステップ 4 — 署名済みリリースビルド
 
 **方法A — 手動実行:**
-1. **Actions → "Release Build" → Run workflow**
-2. バージョンタグ（例: `v1.0.0`）を入力して Run
+1. 先にタグを作成してpush: `git tag v1.0.0 && git push origin v1.0.0`
+2. **Actions → "Release Build" → Run workflow**
+3. 作成したタグ（例: `v1.0.0`）を入力して Run
+
+> **重要:** 手動実行時はタグ名で `checkout` します。**タグが事前にpush済みでないと checkout で失敗**します。
 
 **方法B — タグpushで自動実行:**
 ```bash
@@ -325,7 +347,7 @@ git push origin v1.0.0
 
 ### ローカルビルド（任意）
 
-Java 17以上があればAndroid Studio不要でビルドできます:
+**Java 17以上** と **Android SDK**（コマンドラインツール・platform・build-tools）が必要です。GitHub Actions のランナーにはプリインストールされていますが、ローカル環境では別途インストールが必要です（[Android SDK セットアップガイド](https://developer.android.com/tools)）:
 
 ```bash
 # デバッグAPK → app/build/outputs/apk/debug/app-debug.apk
@@ -362,12 +384,12 @@ Java 17以上があればAndroid Studio不要でビルドできます:
 このテンプレートのワークフローはサードパーティのActionをすべて**コミットSHA**でピン留めしています。
 
 ```yaml
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 ```
 
-`@v4` のようなバージョンタグは可変ポインターのため、リポジトリオーナーがいつでも別のコードに差し替えられます。サプライチェーン攻撃やアカウント侵害が起きた場合、`@v4` を使っている全プロジェクトで次回実行時に攻撃者のコードが動きます（リポジトリのSecretsに完全アクセスした状態で）。
+`@v6` のようなバージョンタグは可変ポインターのため、リポジトリオーナーがいつでも別のコードに差し替えられます。サプライチェーン攻撃やアカウント侵害が起きた場合、`@v6` を使っている全プロジェクトで次回実行時に攻撃者のコードが動きます（リポジトリのSecretsに完全アクセスした状態で）。
 
-コミットSHAは不変なので、レビュー済みのコードだけが実行されることを保証できます。コメント（`# v4`）でバージョンも一目でわかります。
+コミットSHAは不変なので、レビュー済みのコードだけが実行されることを保証できます。コメント（`# v6`）でバージョンも一目でわかります。
 
 📖 [GitHub Actions セキュリティ強化ガイド](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)（GitHub公式）
 
