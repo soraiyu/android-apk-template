@@ -1,6 +1,6 @@
 # 📦 Android APK Template
 
-### No Android Studio. No keytool. No hassle. — Build & ship signed APKs entirely in GitHub Actions.
+### A template for building and shipping signed Android APKs entirely in GitHub Actions — no Android Studio installation needed.
 
 [![Debug Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/android-ci.yml?label=Debug%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/android-ci.yml)
 [![Release Build](https://img.shields.io/github/actions/workflow/status/soraiyu/android-apk-template/release.yml?label=Release%20Build&logo=android&logoColor=white&color=3DDC84)](https://github.com/soraiyu/android-apk-template/actions/workflows/release.yml)
@@ -10,23 +10,23 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/soraiyu/android-apk-template?style=social)](https://github.com/soraiyu/android-apk-template/stargazers)
 
-> 🔑 **The killer feature:** Run one workflow → keystore auto-generated → all signing secrets auto-registered. Zero manual keytool commands.
+I made this because I wanted to work on Android side projects without installing Android Studio on every machine I use. If you're in a similar situation — shared PC, low-spec laptop, or just want a lightweight setup — this might be useful.
 
 ---
 
-## ✨ Why this template?
+## ✨ What this template does
 
-| 🙋 You are… | ✅ This template delivers… |
+| Situation | How it helped me |
 |---|---|
-| On a slow/low-spec PC, can't run Android Studio | **Zero local setup** — GitHub Actions handles everything |
-| Starting a side project or quick prototype | Minimal boilerplate, push-to-build in minutes |
-| Struggling with Android keystores & signing | **Auto-generated keystore + secrets** — no keytool required |
-| Shipping APKs to friends, testers, or yourself | Download signed APKs directly from the Actions Artifacts tab |
-| Security-aware | All third-party Actions pinned to immutable commit SHAs |
+| Shared or low-spec PC where Android Studio is hard to run | Everything runs on GitHub Actions — nothing to install locally |
+| Starting a quick side project | Minimal boilerplate; just push and the build runs |
+| Not sure how Android keystores work | Running one workflow auto-generates a keystore and saves all signing secrets — no keytool commands needed |
+| Sharing APKs with friends or testers | Signed APKs are downloadable from the Actions Artifacts tab |
+| Cautious about supply chain risks | All third-party Actions are pinned to immutable commit SHAs |
 
 ---
 
-## 🚀 How it works — 5 minutes to your first signed APK
+## 🚀 How it works
 
 ```
 ① Use this template  →  ② Add GH_PAT secret  →  ③ Run generate-keystore
@@ -86,13 +86,15 @@ GitHub's built-in `GITHUB_TOKEN` can't write repository Secrets — you need a P
 4. **Repo → Settings → Secrets and variables → Actions → New repository secret**
    Name: `GH_PAT` · Value: *paste token* → **Add secret**
 
-> ✅ One-time only. Everything after this is fully automated.
+> This is a one-time setup. Everything after this runs automatically.
 
 ---
 
 ## 🗝 Step 2 — Generate your keystore (auto-saves Secrets)
 
 **Actions → "Generate Android Keystores" → Run workflow**
+
+One thing I found helpful here: the workflow auto-generates a keystore and saves all signing secrets directly to the repo — no manual keytool commands or copy-pasting needed.
 
 All fields have sensible defaults — just click Run if you're unsure:
 
@@ -224,19 +226,19 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 
 ## android-apk-template（日本語）
 
-**Android Studio不要** — GitHub Actions だけで署名済みAPKを自動ビルドできる最小構成テンプレートです。
+Android Studioをインストールしなくても、GitHub Actionsだけでビルド・署名済みAPKの配布ができるテンプレートを作ってみました。
 
-> 🔑 **一番の売り：** ワークフローを1回実行するだけで、keystoreが自動生成されてすべての署名Secretsが自動登録されます。keytoolコマンドは一切不要。
+家族共有のPCや非力なラップトップしかなくて「Android開発は無理かも…」と感じたことがきっかけです。同じような状況の方の参考になれば。
 
-### こんな方におすすめ
+### このテンプレートでできること
 
-| 🙋 こんな方に | ✅ このテンプレートが解決します |
+| こんな状況に | 僕が助かった点 |
 |---|---|
-| 非力PCでAndroid Studioが重くて使えない | **ローカル環境不要** — GitHub Actionsが全部やってくれる |
-| サイドプロジェクトをさっさと始めたい | 最小構成ですぐbuild可能 |
-| keystoreや署名の仕組みがわからない | **keystore自動生成＋Secrets自動登録** — keytool不要 |
-| 友人・テスター・自分にAPKを配りたい | ActionsのArtifactsタブから署名済みAPKをダウンロード |
-| セキュリティを意識している | サードパーティActionを全てコミットSHAでピン留め |
+| 非力なPCやAndroid Studioが動かせない環境 | GitHub Actionsがすべて処理してくれるので、ローカルに何もインストール不要 |
+| サイドプロジェクトをサクッと始めたい | 最小構成でpushすればビルドが走る |
+| keystoreや署名まわりがよくわからない | ワークフローを1回実行するだけでkeystore生成→Secrets登録まで自動でやってくれる（keytoolコマンド不要） |
+| 友人・テスターにAPKを渡したい | ActionsのArtifactsタブから署名済みAPKをダウンロードできる |
+| サプライチェーンリスクが気になる | サードパーティのActionをすべてコミットSHAでピン留めしている |
 
 ### ワークフロー一覧
 
@@ -281,11 +283,13 @@ app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/your
 4. **リポジトリ → Settings → Secrets and variables → Actions → New repository secret**
    名前: `GH_PAT` · 値: コピーしたトークン → **Add secret**
 
-> ✅ 初回のみの作業です。以降はすべて自動で動きます。
+> 初回のみの作業です。以降はすべて自動で動きます。
 
 ### ステップ 2 — キーストアの自動生成（Secrets自動登録）
 
 **Actions → "Generate Android Keystores" → Run workflow**
+
+個人的に一番助かった機能です。このワークフローを1回実行するだけで、keystoreが生成されてすべての署名用SecretsがリポジトリにそのままSecretsとして登録されます。keytoolコマンドは不要です。
 
 すべての入力項目にデフォルト値があるので、迷ったらそのまま Run でOKです:
 
