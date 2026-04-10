@@ -226,15 +226,15 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 
 ## android-apk-template（日本語）
 
-Android Studioをインストールしなくても、GitHub Actionsだけでビルド・署名済みAPKの配布ができるテンプレートを作ってみました。家族共有のPCや非力なラップトップしか手元になかったのがきっかけです。同じような状況の方の参考になれば。
+GitHub Actionsだけでビルドと署名ができるテンプレートを作ってみました。共有PCしか手元になかったので、同じような状況の方の参考になれば。
 
 ### このテンプレートでできること
 
-| こんな状況に | 僕が助かった点 |
+| こんな状況に | この部分が助かった |
 |---|---|
 | 非力なPCやAndroid Studioが動かせない環境 | GitHub Actionsで動くので、ローカルには何もインストールしなくてすんだ |
 | サイドプロジェクトをサクッと始めたい | 最小構成でpushすればビルドが走る |
-| keystoreや署名まわりがよくわからない | ワークフローを1回動かすとkeystore生成から **Settings → Secrets and variables → Actions** への登録まで済んだ（keytoolは使わなかった） |
+| keystoreや署名まわりがよくわからない | ワークフローを動かすとkeystoreが生成されて **Settings → Secrets and variables → Actions** に登録された（keytoolコマンドを触らずに済んだ） |
 | 友人・テスターにAPKを渡したい | ActionsのArtifactsタブから署名済みAPKをダウンロードできる |
 | サプライチェーンリスクが気になる | サードパーティのActionをすべてコミットSHAでピン留めしている |
 
@@ -287,7 +287,7 @@ app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/your
 
 **Actions → "Generate Android Keystores" → Run workflow**
 
-助かった点の一つ：このワークフローを動かすと、keystoreが生成されて署名用のSecretsが **Settings → Secrets and variables → Actions** に登録されます。keytoolは触らずに済みました。
+少し助かったことの一つ：このワークフローを動かすと、keystoreが生成されて署名用のSecretsが **Settings → Secrets and variables → Actions** に登録されました。keytoolは触らずに済みました。
 
 すべての入力項目にデフォルト値があるので、迷ったらそのまま Run でOKです:
 
