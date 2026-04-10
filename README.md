@@ -18,10 +18,10 @@ I made this because I wanted to build Android side projects on a shared PC witho
 
 | Situation | How it helped me |
 |---|---|
-| Shared or low-spec PC where Android Studio is hard to run | Everything runs on GitHub Actions — nothing to install locally |
-| Starting a quick side project | Minimal boilerplate; just push and the build runs |
+| Shared or low-spec PC where Android Studio is hard to run | Everything ran on GitHub Actions — I didn't need to install anything locally |
+| Starting a quick side project | Minimal boilerplate; I just pushed and a build started |
 | Not sure how Android keystores work | Running one workflow generated a keystore and registered the signing secrets to **Settings → Secrets and variables → Actions** |
-| Sharing APKs with friends or testers | Signed APKs are downloadable from the Actions Artifacts tab |
+| Sharing APKs with friends or testers | Signed APKs showed up in the Actions Artifacts tab, ready to download |
 | Cautious about supply chain risks | All third-party Actions are pinned to immutable commit SHAs |
 
 ---
