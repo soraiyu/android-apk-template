@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/soraiyu/android-apk-template?style=social)](https://github.com/soraiyu/android-apk-template/stargazers)
 
-I made this because I wanted to work on Android side projects without installing Android Studio on every machine I use. If you're in a similar situation — shared PC, low-spec laptop, or just want a lightweight setup — this might be useful.
+I made this because I wanted to build Android side projects on a shared PC without installing Android Studio. If that sounds familiar, this might be useful.
 
 ---
 
@@ -20,7 +20,7 @@ I made this because I wanted to work on Android side projects without installing
 |---|---|
 | Shared or low-spec PC where Android Studio is hard to run | Everything runs on GitHub Actions — nothing to install locally |
 | Starting a quick side project | Minimal boilerplate; just push and the build runs |
-| Not sure how Android keystores work | Running one workflow auto-generates a keystore and saves all signing secrets — no keytool commands needed |
+| Not sure how Android keystores work | Running one workflow generates a keystore and registers the signing secrets to **Settings → Secrets and variables → Actions** — no keytool involved |
 | Sharing APKs with friends or testers | Signed APKs are downloadable from the Actions Artifacts tab |
 | Cautious about supply chain risks | All third-party Actions are pinned to immutable commit SHAs |
 
@@ -94,7 +94,7 @@ GitHub's built-in `GITHUB_TOKEN` can't write repository Secrets — you need a P
 
 **Actions → "Generate Android Keystores" → Run workflow**
 
-One thing I found helpful here: the workflow auto-generates a keystore and saves all signing secrets directly to the repo — no manual keytool commands or copy-pasting needed.
+One thing that helped me: the workflow generates a keystore and registers all signing secrets to **Settings → Secrets and variables → Actions** — so there's no need to run keytool or copy anything manually.
 
 All fields have sensible defaults — just click Run if you're unsure:
 
@@ -106,7 +106,7 @@ All fields have sensible defaults — just click Run if you're unsure:
 | `key_c` | `US` | ISO country code |
 | `validity_days` | `10000` (~27 yrs) | How long the cert is valid |
 
-After the workflow finishes, these Secrets appear automatically — **no copy-paste needed**:
+After the workflow finishes, these Secrets show up in **Settings → Secrets and variables → Actions**:
 
 | Secret | What it contains |
 |---|---|
@@ -226,17 +226,15 @@ A commit SHA is immutable. Pinning to a SHA guarantees you always run exactly th
 
 ## android-apk-template（日本語）
 
-Android Studioをインストールしなくても、GitHub Actionsだけでビルド・署名済みAPKの配布ができるテンプレートを作ってみました。
-
-家族共有のPCや非力なラップトップしかなくて「Android開発は無理かも…」と感じたことがきっかけです。同じような状況の方の参考になれば。
+Android Studioをインストールしなくても、GitHub Actionsだけでビルド・署名済みAPKの配布ができるテンプレートを作ってみました。家族共有のPCや非力なラップトップしか手元になかったのがきっかけです。同じような状況の方の参考になれば。
 
 ### このテンプレートでできること
 
 | こんな状況に | 僕が助かった点 |
 |---|---|
-| 非力なPCやAndroid Studioが動かせない環境 | GitHub Actionsがすべて処理してくれるので、ローカルに何もインストール不要 |
+| 非力なPCやAndroid Studioが動かせない環境 | GitHub Actionsで動くので、ローカルには何もインストールしなくてすんだ |
 | サイドプロジェクトをサクッと始めたい | 最小構成でpushすればビルドが走る |
-| keystoreや署名まわりがよくわからない | ワークフローを1回実行するだけでkeystore生成→Secrets登録まで自動でやってくれる（keytoolコマンド不要） |
+| keystoreや署名まわりがよくわからない | ワークフローを1回動かすとkeystore生成から **Settings → Secrets and variables → Actions** への登録まで済んだ（keytoolは使わなかった） |
 | 友人・テスターにAPKを渡したい | ActionsのArtifactsタブから署名済みAPKをダウンロードできる |
 | サプライチェーンリスクが気になる | サードパーティのActionをすべてコミットSHAでピン留めしている |
 
@@ -289,7 +287,7 @@ app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/your
 
 **Actions → "Generate Android Keystores" → Run workflow**
 
-個人的に一番助かった機能です。このワークフローを1回実行するだけで、keystoreが生成されてすべての署名用SecretsがリポジトリにそのままSecretsとして登録されます。keytoolコマンドは不要です。
+このワークフローを1回動かすと、keystoreが生成され、署名用のSecretsが **Settings → Secrets and variables → Actions** に登録されます。keytoolは使いませんでした。
 
 すべての入力項目にデフォルト値があるので、迷ったらそのまま Run でOKです:
 
@@ -301,7 +299,7 @@ app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/your
 | `key_c` | `US` | ISO国コード |
 | `validity_days` | `10000`（約27年） | 証明書の有効期間 |
 
-ワークフロー完了後、以下のSecretsが**自動的に登録**されます（手動コピー不要）:
+ワークフロー完了後、以下のSecretsが **Settings → Secrets and variables → Actions** に登録されます:
 
 | Secret名 | 内容 |
 |---|---|
