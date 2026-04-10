@@ -20,7 +20,7 @@ I made this because I wanted to build Android side projects on a shared PC witho
 |---|---|
 | Shared or low-spec PC where Android Studio is hard to run | Everything runs on GitHub Actions — nothing to install locally |
 | Starting a quick side project | Minimal boilerplate; just push and the build runs |
-| Not sure how Android keystores work | Running one workflow generates a keystore and registers the signing secrets to **Settings → Secrets and variables → Actions** — no keytool involved |
+| Not sure how Android keystores work | Running one workflow generated a keystore and registered the signing secrets to **Settings → Secrets and variables → Actions** |
 | Sharing APKs with friends or testers | Signed APKs are downloadable from the Actions Artifacts tab |
 | Cautious about supply chain risks | All third-party Actions are pinned to immutable commit SHAs |
 
@@ -94,7 +94,7 @@ GitHub's built-in `GITHUB_TOKEN` can't write repository Secrets — you need a P
 
 **Actions → "Generate Android Keystores" → Run workflow**
 
-One thing that helped me: the workflow generates a keystore and registers all signing secrets to **Settings → Secrets and variables → Actions** — so there's no need to run keytool or copy anything manually.
+One thing that helped me: the workflow generates a keystore and registers the signing secrets to **Settings → Secrets and variables → Actions** — I didn't need to touch keytool.
 
 All fields have sensible defaults — just click Run if you're unsure:
 
@@ -287,7 +287,7 @@ app/src/test/java/com/example/myapp/   →   app/src/test/java/com/yourname/your
 
 **Actions → "Generate Android Keystores" → Run workflow**
 
-このワークフローを1回動かすと、keystoreが生成され、署名用のSecretsが **Settings → Secrets and variables → Actions** に登録されます。keytoolは使いませんでした。
+助かった点の一つ：このワークフローを動かすと、keystoreが生成されて署名用のSecretsが **Settings → Secrets and variables → Actions** に登録されます。keytoolは触らずに済みました。
 
 すべての入力項目にデフォルト値があるので、迷ったらそのまま Run でOKです:
 
